@@ -1,0 +1,37 @@
+{
+  "name": "node",
+  "version": "5.0.7",
+  "description": "Testing node with express, ogr2ogr",
+  "main": "main.js",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "cookie-parser": "^1.4.1",
+    "ejs": "^2.4.1",
+    "express": "^4.13.4",
+    "jsdom": "^8.1.0",
+    "jsonfile": "^2.2.3",
+    "multer": "^1.1.0",
+    "nodemon": "^1.9.0",
+    "ogr2ogr": "^0.5.1",
+    "togeojson": "^0.13.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node main.js",
+    "start": "nodemon main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manikanta-kondeti/codes"
+  },
+  "keywords": [
+    "ogr2ogr",
+    "node",
+    "basic",
+    "express",
+    "gis",
+    "mani"
+  ],
+  "author": "mani.iiit123@gmail.com",
+  "license": "MIT"
+}
