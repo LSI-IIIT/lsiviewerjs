@@ -42,7 +42,7 @@ window.onload = function() {
 function submitForm() {
 
     var options = {  
-        url: 'http://localhost:8081/uploadFiles',
+        url: '/uploadFiles',
         success: function(response) { 
             $("#upload_form")[0].reset();
             $('#uploadModal').modal('hide');
