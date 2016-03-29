@@ -23,7 +23,9 @@ var _zoomX = canvasWidth / 2,
     _penWidth = 1,
     _fillColor = "#c9baba",
     _strokeColor = "000000",
+    _backgroundColor = null;
     scaleCount = 1;
+    _exporting = false;
 var _mouseMove = 0;
 
 
@@ -36,6 +38,12 @@ var geojson, labels = [],
 
 /* Main Code  */
 window.onload = function() {
+    /**
+     *  We must not show canvas background color (Color paletter that used while exporting) without selecting color as an option. Therefore hide it in the initial load. 
+    **/
+    var backgroundColorDiv = document.getElementById("backgroundColorDiv");
+    backgroundColorDiv.hidden = true;
+
     addImageOnCanvas('./assets/img/upload_files.jpg')
 };
 
@@ -134,7 +142,11 @@ function loadData(response) {
     traverseLabels(geojson.features);
 };
 
-// Initial Function
+/**
+  * initJson : 
+  * This method will declare the canvas and context along with their width and height. 
+  * @param: shift_graph_to_center is used to if graph needs to be drawn from center.    
+ **/
 function initJson(geojson) {
     //Initial setup for canvas
     canvas = document.getElementById('map');
@@ -179,7 +191,6 @@ var getCenter = function(coords, geomtype) {
         centerY = 0;
     // console.log("geomtype = "+ geomtype+ "coords = "+ coords.length);
     if (geomtype == "Point") {
-        console.log("In getCenters method, With point data x = " + coords[0] + " y = " + coords[1]);
         centerX = coords[0];
         centerY = coords[1];
     } else if (geomtype == "LineString") {
@@ -252,6 +263,10 @@ function draw(features, action) {
     context.beginPath();
     context.clearRect(0, 0, (canvasWidth), (canvasHeight));
 
+    if (_backgroundColor != null) {
+        context.fillStyle = _backgroundColor;
+        context.fillRect(0,0,canvasWidth, canvasHeight)
+    }
     context.save();
 
     context.translate(_zoomX, _zoomY);
@@ -336,7 +351,11 @@ function draw(features, action) {
             }
         }
     }
-
+    if (_exporting == true) {
+        context.font = "12pt Calibri";
+        context.fillStyle = _labelColor;
+        context.fillText("Generating using Lsiviewer", canvasWidth/2 - 60, canvasHeight - 30);
+    }
     context.restore();
 }
 
@@ -519,6 +538,28 @@ function _penDecrease() {
     draw(geojson.features, 'draw');
     console.log("Decrease Called");
 }
+/**
+ *  Background Color change while exporting the data.
+ */
+function _addCanvasColor() {
+    background_color = document.getElementById('background_color_export').value;
+    if (background_color == "white") {
+        _backgroundColor = "#ffffff";
+        draw(geojson.features, 'draw');
+        var backgroundColorDiv = document.getElementById('backgroundColorDiv');
+        backgroundColorDiv.hidden = true;
+    }
+    else if (background_color == "color") {
+        var backgroundColorDiv = document.getElementById('backgroundColorDiv');
+        backgroundColorDiv.hidden = false;
+    }
+    else if (background_color == "transparent") {
+        var backgroundColorDiv = document.getElementById('backgroundColorDiv');
+        backgroundColorDiv.hidden = true;
+        _backgroundColor = null;
+        draw(geojson.features, 'draw');
+    }
+}
 
 /**
  * Export data as png, jpg
@@ -528,6 +569,8 @@ function _export() {
     console.log(_export_type);
     var img;
     var a = document.getElementById('download_link');
+    _exporting = true;
+    draw(geojson.features, 'draw');
     if (_export_type == "PNG") {
         img = canvas.toDataURL("image/png");
         a.download = "map.png";
@@ -539,6 +582,9 @@ function _export() {
     
     a.href = img;
     a.click();
+    _exporting = false;
+    _backgroundColor = null;
+    draw(geojson.features, 'draw');
 }
 
 /** 
@@ -692,6 +738,15 @@ $(document).ready(function() {
         showButtons: false,
         move: function(color) {
             _fillColor = $('#fill_color').spectrum('get').toHexString();
+            draw(geojson.features, 'draw');
+        }
+    });
+
+     $("#fill_background_color").spectrum({
+        color: "#f00",
+        showButtons: false,
+        move: function(color) {
+            _backgroundColor =  $('#fill_background_color').spectrum('get').toHexString();
             draw(geojson.features, 'draw');
         }
     });
