@@ -25,7 +25,9 @@ var storage =   multer.diskStorage({
 });
 
 app.use(express.static('assets'));
+app.use(express.static('uploads'));
 app.use('/assets', express.static('assets'));
+app.use('/uploads', express.static('uploads'));
 app.set('view engine', 'html');
 app.engine('html', require('ejs').renderFile);
 var upload = multer({ storage : storage })
@@ -61,6 +63,10 @@ app.get('/', function(req, res) {
 
 app.get('/lsiviewer', function(req, res) {
 	res.render('lsiviewer.html');
+});
+
+app.get('/wms', function(req, res) {
+	res.render('wms.html');
 });
 
 
