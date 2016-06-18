@@ -82,6 +82,11 @@
                         </li>
                         <li>
                             <button href="#uploadModal" id="openBtn" data-toggle="modal" style="margin-top:13px;" class="btn btn-info">UPLOAD</button>
+
+                        </li>
+                        <li>
+                            <a style="margin: 0 auto;" id="export-png" download="map.jpg">
+                                 <button  class="btn btn-success" >Export as PNG</button></a>
                         </li>
                     </ul>
                 </div>
@@ -94,16 +99,15 @@
             
                     
                         
-                           <a style="margin: 0 auto;" id="export-png" download="map.jpg">
-                                 <button  class="btn btn-success" >Export as PNG</button></a> 
+                            
                     
 
         </div>
 
 
         <div id="map" class="map">
-                    <!--  <canvas  id="map" class="map" ondblclick="_zoomEvent(event)" width="1450" height="580"></canvas> -->
-                </div>
+                     <canvas  id="canvas" class="canvas"  width="1450" height="580"></canvas>
+        </div>
         <div class="modal fade" id="myModal">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -235,7 +239,7 @@
             </div>
         </footer>
         <script>
-            // Necessary for file validation 
+          // Necessary for file validation 
             var MIME_TYPES = {
               'shapefile' : ['shp', 'shx', 'dbf'],
               'gpx' : ['gpx'],
@@ -261,147 +265,9 @@
                 }
                 console.log("select_file_format = " + select_file_format);
               }
-            var image = new ol.style.Circle({
-                  radius: 5,
-                  fill: null,
-                  stroke: new ol.style.Stroke({color: 'red', width: 1})
-                });
-            
-                var styles = {
-                  'Point': new ol.style.Style({
-                    image: image
-                  }),
-                  'LineString': new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                      color: 'green',
-                      width: 1
-                    })
-                  }),
-                  'MultiLineString': new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                      color: 'green',
-                      width: 1
-                    })
-                  }),
-                  'MultiPoint': new ol.style.Style({
-                    image: image
-                  }),
-                  'MultiPolygon': new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                      color: 'yellow',
-                      width: 1
-                    }),
-                    fill: new ol.style.Fill({
-                      color: 'rgba(255, 255, 0, 0.1)'
-                    })
-                  }),
-                  'Polygon': new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                      color: 'blue',
-                      lineDash: [4],
-                      width: 3
-                    }),
-                    fill: new ol.style.Fill({
-                      color: 'rgba(0, 0, 255, 0.1)'
-                    })
-                  }),
-                  'GeometryCollection': new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                      color: 'magenta',
-                      width: 2
-                    }),
-                    fill: new ol.style.Fill({
-                      color: 'magenta'
-                    }),
-                    image: new ol.style.Circle({
-                      radius: 10,
-                      fill: null,
-                      stroke: new ol.style.Stroke({
-                        color: 'magenta'
-                      })
-                    })
-                  }),
-                  'Circle': new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                      color: 'red',
-                      width: 2
-                    }),
-                    fill: new ol.style.Fill({
-                      color: 'rgba(255,0,0,0.2)'
-                    })
-                  })
-                };
-            
-                var styleFunction = function(feature) {
-                  return styles[feature.getGeometry().getType()];
-                };
-            
-                
-               
-            var myStlye = new ol.style.Style ({
-          fill: new ol.style.Fill({
-             color: 'rgba(255,100,50,0.5)'
-           })                                
-        });
-
-            
-
-                var VectorLayer = new ol.layer.Vector({
-                   title: 'added Layer',
-                   source: new ol.source.Vector({
-                   url: '/uploads/Evening_Run_day2.json',
-                   defaultProjection :'EPSG:4326', projection: 'EPSG:3857',
-                   style : myStlye,
-                   format: new ol.format.GeoJSON()
-                  })
-                });
-            
-                var map = new ol.Map({
-                  layers: [
-                    new ol.layer.Tile({
-                      source: new ol.source.OSM()
-                    }),
-                    VectorLayer
-                  ],
-                  target: 'map',
-                  controls: ol.control.defaults({
-                    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-                      collapsible: false
-                    })
-                  }),
-                  view: new ol.View({
-                    center: [0, 0],
-                    zoom: 2
-                  })
-                });
-                console.log('VectorLayer.getSource().getExtent() = ' + VectorLayer.getSource().getExtent().length + "map = " + map);
-               
-               
-                VectorLayer.getSource().on("change", function(evt) {
-                  extent = VectorLayer.getSource().getExtent();
-                  map.getView().fit(extent, map.getSize());
-                });
-                 
-              var exportPNGElement = document.getElementById('export-png');
-
-                if ('download' in exportPNGElement) {
-                  exportPNGElement.addEventListener('click', function(e) {
-                    map.once('postcompose', function(event) {
-                      var canvas = event.context.canvas;
-                      exportPNGElement.href = canvas.toDataURL('image/png');
-                    });
-                    map.renderSync();
-                  }, false);
-                } else {
-                  var info = document.getElementById('no-download');
-                  /**
-                   * display error message
-                   */
-                  info.style.display = '';
-                }
         </script> 
         <script src="http://malsup.github.com/jquery.form.js"></script> 
-        
+        <script type="text/javascript" src="./assets/js/wms.js"></script> 
         <!--  <script type="text/javascript" src="./assets/js/lsiviewer.js"></script> -->
     </body>
 </html>

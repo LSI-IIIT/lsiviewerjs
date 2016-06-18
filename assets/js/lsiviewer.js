@@ -43,7 +43,7 @@ window.onload = function() {
     **/
     var backgroundColorDiv = document.getElementById("backgroundColorDiv");
     backgroundColorDiv.hidden = true;
-    addImageOnCanvas('./assets/img/upload_files.jpg')
+    addImageOnCanvas('./assets/img/upload_files.jpg');
 };
 
 function submitForm() {
