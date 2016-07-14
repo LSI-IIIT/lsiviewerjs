@@ -9,8 +9,7 @@
  */
 /* Global Variables Declaration */
 /* Related to Canvas */
-var canvas = document.getElementById("map"), context, canvasWidth = 1450,
-    canvasHeight = 600,
+var canvas = document.getElementById("map"), context, canvasWidth=window.innerWidth, canvasHeight=window.innerHeight,
     drawScale = null, xMin = 1000000000, xMax, yMin = 1000000000, yMax, shift_graph_to_center = 0;
 
 /* Related to styling */
@@ -41,6 +40,10 @@ window.onload = function() {
     /**
      *  We must not show canvas background color (Color paletter that used while exporting) without selecting color as an option. Therefore hide it in the initial load. 
     **/
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvasWidth = canvas.width;
+    canvasHeight = canvas.height;
     var backgroundColorDiv = document.getElementById("backgroundColorDiv");
     backgroundColorDiv.hidden = true;
     addImageOnCanvas('./assets/img/upload_files.jpg');
@@ -81,8 +84,8 @@ function submitForm() {
   labelsFill and traverseLabels (Filling labels in arrays and giving control to the UI)--- 
  */
 function clearCanvas() {
-    canvasWidth = 1450,
-    canvasHeight = 600,
+    canvasWidth = window.innerWidth,
+    canvasHeight = window.innerHeight,
     drawScale = null;
     _zoomX = canvasWidth / 2,
     _zoomY = canvasHeight / 2,
@@ -118,8 +121,9 @@ function addImageOnCanvas(url) {
     var imageObj = new Image();
 
     imageObj.onload = function() {
-        context.drawImage(imageObj, 340, 20);
+        context.drawImage(imageObj, canvasWidth/4, 20);
     };
+    
     imageObj.src = url;
 }
 
@@ -594,6 +598,7 @@ function _export() {
 
 function labelToggle() {
     var labelButton = document.getElementById("label").value;
+    
     if (labelButton != "None") {
         labelFlag = 1;
         //   console.log(geojson);

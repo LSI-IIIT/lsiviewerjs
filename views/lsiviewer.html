@@ -12,6 +12,9 @@
     <script src="./assets/js/spectrum.js"></script>
 
     <style>
+        body {
+            overflow: hidden;
+        }
         .help-block {
             display: inline;
         }
@@ -143,7 +146,7 @@
                     </div>
                     <div class="col-md-1">
                         <select id="label" onchange="labelToggle();" class="labels form-control">
-                            <option>Label</option>
+                            <option value="None">Label</option>
                         </select>
                     </div>
 
@@ -164,7 +167,7 @@
             </div>
         </div>
         <!-- /.row -->
-        <canvas id="map" ondblclick="_zoomEvent(event)" width="1450" height="580"></canvas>
+        <canvas id="map" style="overflow:hidden;" ondblclick="_zoomEvent(event)" ></canvas>
     </div>
 
 
@@ -350,16 +353,7 @@
         </div>
     </div>
 
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-10 col-lg-offset-1 text-center">
-                    <hr class="small">
-                    <p class="text-muted">Copyright &copy; Lsiviewer 2015-2016</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+ 
 
     <script>
         // Necessary for file validation 

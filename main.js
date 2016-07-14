@@ -69,6 +69,15 @@ app.get('/wms', function(req, res) {
 	res.render('wms.html');
 });
 
+app.get('/login', function(req, res) {
+	res.render('login.html');
+});
+
+app.get('/login_success', function(req, res) {
+	res.render('login_successful.html');
+});
+
+
 
 // Necessary for file validation 
 var MIME_TYPES = {
