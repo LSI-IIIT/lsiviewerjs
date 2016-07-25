@@ -352,12 +352,13 @@ function draw(features, action) {
             }
         }
     }
+    
+    context.restore();
     if (_exporting == true) {
-        context.font = "12pt Calibri";
-        context.fillStyle = _labelColor;
+        context.font = "14pt Calibri";
+        context.fillStyle = "#000000";
         context.fillText("Generating using Lsiviewer", canvasWidth/2 - 60, canvasHeight - 30);
     }
-    context.restore();
 }
 
 /**
@@ -585,6 +586,7 @@ function _export() {
     a.click();
     _exporting = false;
     _backgroundColor = null;
+    document.getElementById('export').value = "NONE";
     draw(geojson.features, 'draw');
 }
 
