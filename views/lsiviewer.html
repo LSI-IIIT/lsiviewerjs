@@ -85,9 +85,14 @@
                     <li>
                         <button href="#aboutModal" id="openBtn" data-toggle="modal" style="margin-top:13px;" class="btn btn-info" onclick="aboutDialog();">ABOUT</button>
                     </li>
-                    </li>
+
                     <li>
                         <button href="#uploadModal" id="openBtn" data-toggle="modal" style="margin-top:13px;" class="btn btn-info">UPLOAD</button>
+                        <a href="#" id="download_link" download="map.jpg"></a>
+                    </li>
+
+                     <li>
+                        <button href="#exportModal" id="openBtn" data-toggle="modal" style="margin-top:13px;" class="btn btn-info">EXPORT</button>
                     </li>
                 </ul>
 
@@ -129,7 +134,7 @@
                         <button title="Penwidth decrease" class="btn btn-sm" onClick="_penDecrease()"><i class="fa fa-minus"></i>
                         </button>
                     </div>
-                    <div class="col-md-2" style="width : 150px;">
+                    <div class="col-md-2">
                         <span class="help-block">Fill Color &nbsp;</span>
                         <input title="Fill color" type='button' id="fill_color"></input>
                     </div>
@@ -149,18 +154,7 @@
                             <option value="None">Label</option>
                         </select>
                     </div>
-
-                    <div class="col-md-1">
-                        <button href="#exportModal" id="openBtn" data-toggle="modal" class="btn btn-info">EXPORT</button>
-                        <!--
-                        <select id="export" onchange="_export();" class="form-control">
-                            <option value="Export as">Export as</option>
-                            <option value="PNG">PNG</option>
-                            <option value="JPG">JPG</option>
-                        </select>
-                    -->
-                    </div>
-                    <a href="#" id="download_link" download="map.jpg"></a>
+                                        
 
                 </div>
 

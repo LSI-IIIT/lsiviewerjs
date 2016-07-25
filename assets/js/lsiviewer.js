@@ -119,11 +119,9 @@ function addImageOnCanvas(url) {
     canvas = document.getElementById('map');
     context = canvas.getContext('2d');
     var imageObj = new Image();
-
     imageObj.onload = function() {
-        context.drawImage(imageObj, canvasWidth/4, 20);
-    };
-    
+        context.drawImage(imageObj, canvasWidth/2- imageObj.width/2, canvasHeight/2 - imageObj.height);
+    };    
     imageObj.src = url;
 }
 

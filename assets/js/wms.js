@@ -11,7 +11,7 @@
 /* Related to Canvas */
 /* Main Code  */
 
-var map, VectorLayer=null, VectorSource = null;
+var map, VectorLayer=null, VectorSource = null, canvasWidth=window.innerWidth, canvasHeight=window.innerHeight;
 
 window.onload = function() {
     /**
@@ -27,7 +27,7 @@ function addImageOnCanvas(url) {
     var imageObj = new Image();
 
     imageObj.onload = function() {
-        context.drawImage(imageObj, 340, 20);
+        context.drawImage(imageObj, canvasWidth/2 - imageObj.width/2, canvasHeight/2 - imageObj.height);
     };
     imageObj.src = url;
 }
