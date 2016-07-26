@@ -190,7 +190,7 @@ app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 	    
 
 	}
-
+	console.log("file type = " + file_type);
 	if (file_type == "shapefile" || file_type == "gml") {
 
 		var geojson = ogr2ogr(filepath)
@@ -216,7 +216,7 @@ app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 });
 
 
-var server = app.listen(8081, function () {
+var server = app.listen(8095, function () {
 
   var host = server.address().address
   var port = server.address().port

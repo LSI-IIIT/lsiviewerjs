@@ -357,7 +357,7 @@ function draw(features, action) {
     if (_exporting == true) {
         context.font = "14pt Calibri";
         context.fillStyle = "#000000";
-        context.fillText("Generating using Lsiviewer", canvasWidth/2 - 60, canvasHeight - 30);
+        context.fillText("Generating using Lsiviewer(http://lsi.iiit.ac.in/lsiviewer)", canvasWidth/2 - 120, canvasHeight - 30);
     }
 }
 

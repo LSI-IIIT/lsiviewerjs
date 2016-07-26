@@ -98,13 +98,13 @@ var styles = {
     'LineString': new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: 'green',
-            width: 1
+            width: 3
         })
     }),
     'MultiLineString': new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: 'green',
-            width: 1
+            width: 3
         })
     }),
     'MultiPoint': new ol.style.Style({
@@ -113,7 +113,7 @@ var styles = {
     'MultiPolygon': new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: 'yellow',
-            width: 1
+            width: 3
         }),
         fill: new ol.style.Fill({
             color: 'rgba(255, 255, 0, 0.1)'
