@@ -293,6 +293,10 @@ function draw(features, action) {
     };
 
     imageObj.src = 'assets/img/north.png';
+    if (features.length == undefined) {
+        addImageOnCanvas('./assets/img/error_page.jpg');
+        return
+    }
     console.log('Features length = ' + features.length)
     for (var i = 0; i < features.length; i++) {
         var coords = features[i].geometry.coordinates;
