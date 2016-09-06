@@ -1,53 +1,47 @@
-<!DOCTYPE HTML>
+<!-- views/login.ejs -->
+<!doctype html>
 <html>
-	<head>
-		<title> Login | Lsiviewer</title>
-		<script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
-		
-	</head>
-	<body>
-		Enter country code (e.g. +1):
-		<input type="text" id="country_code" />
-		Enter phone number without spaces (e.g. 444555666):
-		<input type="text" id="phone_num"/>
-		<button onclick="phone_btn_onclick();">Login via SMS</button>
-	</body>
-	<script>
-		  // initialize Account Kit with CSRF protection
-		  AccountKit_OnInteractive = function(){
-		    AccountKit.init(
-		      {
-		        appId:1723423211247521, 
-		        state:"csrf", 
-		        version:"v1.0"
-		      }
-		    );
-		  };
+<head>
+    <title>Node Authentication</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <style>
+        body        { padding-top:80px; }
+    </style>
+</head>
+<body>
+<div class="container">
 
-		  // login callback
-		  function loginCallback(response) {
-		    console.log(response);
-		    if (response.status === "PARTIALLY_AUTHENTICATED") {
-		      document.getElementById("code").value = response.code;
-		      document.getElementById("csrf_nonce").value = response.state;
-		     
-		    }
-		    else if (response.status === "NOT_AUTHENTICATED") {
-		      // handle authentication failure
-		    }
-		    else if (response.status === "BAD_PARAMS") {
-		      // handle bad parameters
-		    }
-		  }
+<div class="col-sm-6 col-sm-offset-3">
 
-		  // phone form submission handler
-		  function phone_btn_onclick() {
-		    var country_code = document.getElementById("country_code").value;
-		    var ph_num = document.getElementById("phone_num").value;
-		    AccountKit.login('PHONE', 
-		      {countryCode: country_code, phoneNumber: ph_num}, // will use default values if this is not specified
-		      loginCallback);
-		  }
+    <h1><span class="fa fa-sign-in"></span> Login</h1>
 
-		</script>
+    <!-- show any messages that come back with authentication -->
+    <% if (message.length > 0) { %>
+        <div class="alert alert-danger"><%= message %></div>
+    <% } %>
+
+    <!-- LOGIN FORM -->
+    <form action="/login" method="post">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-control" name="email">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" name="password">
+        </div>
+
+        <button type="submit" class="btn btn-warning btn-lg">Login</button>
+    </form>
+
+    <hr>
+
+    <p>Need an account? <a href="/signup">Signup</a></p>
+    <p>Or go <a href="/">home</a>.</p>
+
+</div>
+
+</div>
+</body>
 </html>

@@ -8,12 +8,26 @@
     "cookie-parser": "^1.4.1",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
+    "fs": "0.0.1-security",
     "jsdom": "^8.1.0",
     "jsonfile": "^2.2.3",
+    "mongodb": "^2.2.9",
     "multer": "^1.1.0",
     "nodemon": "^1.9.0",
     "ogr2ogr": "^0.5.1",
-    "togeojson": "^0.13.0"
+    "togeojson": "^0.13.0",
+                         
+    "mongoose" : "~3.8.1",          
+    "passport" : "~0.1.17",         
+    "passport-local" : "~0.1.6",    
+    "passport-facebook" : "~1.0.2", 
+    "passport-twitter" : "~1.0.2",  
+    "passport-google-oauth" : "~0.1.5",
+    "connect-flash" : "~0.1.1",     
+    "bcrypt-nodejs" : "latest",
+    "morgan": "~1.0.0",
+    "method-override": "~1.0.0",
+    "express-session": "~1.0.0"
   },
   "devDependencies": {},
   "scripts": {
