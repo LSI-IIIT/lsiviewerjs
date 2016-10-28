@@ -10,6 +10,7 @@ var tj = require('togeojson'),
     // node doesn't have xml parsing or a dom. use jsdom
     jsdom = require('jsdom').jsdom;
 var path = './uploads/';
+var detectvectorformat = require('./detectvectorformat');
 /*
 app.get('/', function (req, res) {
    res.send('Hello World using express dasdas');
@@ -89,51 +90,6 @@ var MIME_TYPES = {
 	'gml' : ['gml']
 }
 
-function validateUploadedFiles(request) {
-	// This variable will keep track of file format information 
-	var file_type = null, filename = null;
-
-	// Iterate through mime files and return true/false
-	for (var itr=0; itr < request.files.length; itr++) {
-		var extracted_mime_type = extract_mime_type(request.files[itr].originalname);
-		filename = request.files[itr].originalname.replace("."+extracted_mime_type, "");
-		if (extracted_mime_type == null) {
-			//catch exception in parent 
-			console.log('extracted type is null with originalname = ' + request.files[itr].originalname);
-			return null;
-		}
-		for (var key in MIME_TYPES) {
-			if (MIME_TYPES[key].indexOf(extracted_mime_type) != -1) {
-				file_type = key;
-			}
-		}
-	}
-
-	if (file_type == null) {
-		// catch exception in parent, says files are not valid
-		console.log('file type is null');
-		return null;
-	}
-	else {
-		return {file_type : file_type, file_name : filename};
-	}
-}
-
-function extract_mime_type(filename) {
-	if (filename == '' || filename == undefined) {
-		return null;
-	}
-	var mimetype = null;
-	if (filename.split('.').length >= 2) {
-		mimetype = filename.split('.').pop();
-	}
-	if (mimetype != null) {
-		return mimetype;
-	}
-	else {
-		return null;
-	}
-}
 
 app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 	
@@ -146,7 +102,7 @@ app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 	 	3. Method for json conversion taking format as response
 	 */
 	 // gen filepath
-	var validated_object = validateUploadedFiles(req);
+	var validated_object = detectvectorformat.validate_uploaded_files(req);
 	var filepath = null;
 	
 	for (var key in MIME_TYPES) {
