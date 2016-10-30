@@ -12,6 +12,11 @@
 var canvas = document.getElementById("map"), context, canvasWidth=window.innerWidth, canvasHeight=window.innerHeight,
     drawScale = null, xMin = 1000000000, xMax, yMin = 1000000000, yMax, shift_graph_to_center = 0;
 
+// benchmarking variables 
+var start_time;
+var end_time;
+
+
 /* Related to styling */
 var _zoomX = canvasWidth / 2,
     _zoomY = canvasHeight / 2,
@@ -47,10 +52,11 @@ window.onload = function() {
     var backgroundColorDiv = document.getElementById("backgroundColorDiv");
     backgroundColorDiv.hidden = true;
     addImageOnCanvas('./assets/img/upload_files.jpg');
+
 };
 
 function submitForm() {
-
+    start_time = performance.now();
     var options = {  
         url: '/uploadFiles',
         success: function(response) { 
@@ -136,9 +142,13 @@ function loadData(response) {
     canvas.addEventListener('DOMMouseScroll', handleScroll, false);
     // Chrome, Safari, IE6: 
     canvas.addEventListener('mousewheel', handleScroll, false);
+    var t0 = performance.now();
     initJson(geojson);
 
     draw(geojson.features, 'draw');
+    var t1 = performance.now();
+    console.log("To draw the file it took " + (t1 - t0) + " milliseconds.")
+    console.log("To communicate with server, convert and draw the file it took " + (t1-start_time) + " milliseconds.")
     labelsFill();
     traverseLabels(geojson.features);
 };
@@ -159,10 +169,10 @@ function initJson(geojson) {
     drawScale = xScale < yScale ? xScale : yScale;
     if (((xMax - xMin) * drawScale) < canvasWidth / 2) {
         shift_graph_to_center = 1;
-        console.log("shift_graph_to_center = " + shift_graph_to_center);
+       // console.log("shift_graph_to_center = " + shift_graph_to_center);
     }
     // check for shifting the figure 
-    console.log(" for Points xMin = " + xMin + " xMax = " + xMax + " yMin = " + yMin + " yMax = " + yMax + " xScale = " + xScale + " yScale = " + yScale + " drawScale = " + drawScale);
+   // console.log(" for Points xMin = " + xMin + " xMax = " + xMax + " yMin = " + yMin + " yMax = " + yMax + " xScale = " + xScale + " yScale = " + yScale + " drawScale = " + drawScale);
 }
 
 /**
@@ -195,7 +205,7 @@ var getCenter = function(coords, geomtype) {
         centerX = coords[0];
         centerY = coords[1];
     } else if (geomtype == "LineString") {
-        console.log("LineString Coords" + coords[0].length);
+     //   console.log("LineString Coords" + coords[0].length);
         for (var i = 0; i < coords.length; i++) {
             var obj = coords[i];
             centerX += parseFloat(obj[0]);
@@ -297,7 +307,7 @@ function draw(features, action) {
         addImageOnCanvas('./assets/img/error_page.jpg');
         return
     }
-    console.log('Features length = ' + features.length)
+  //  console.log('Features length = ' + features.length)
     for (var i = 0; i < features.length; i++) {
         var coords = features[i].geometry.coordinates;
         var geomtype = features[i].geometry.type;
@@ -373,7 +383,7 @@ function traverseCoordinates(coordinates, action, geomtype) {
         var x = coordinates[0];
         var y = coordinates[1];
         if (action == 'bbox') {
-            console.log("in bbox, x = " + x + " xMin = " + xMin);
+//            console.log("in bbox, x = " + x + " xMin = " + xMin);
             xMin = xMin < x ? xMin : x;
             xMax = xMax > x ? xMax : x;
             yMin = yMin < y ? yMin : y;
@@ -717,7 +727,7 @@ function handleScroll(e) {
     // cross-browser wheel delta
     var e = window.event || e; // old IE support
     var delta = (e.wheelDelta / 40 || -e.detail / 2);
-    console.log("delta in handleScroll = " + delta);
+  //  console.log("delta in handleScroll = " + delta);
     if (delta > 1 && delta != 0) {
         zoomClicks += 1;
         _zoomIn();
