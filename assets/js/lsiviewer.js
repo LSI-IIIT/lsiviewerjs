@@ -22,6 +22,11 @@ var start_time;
 var end_time;
 
 
+// benchmarking variables 
+var start_time;
+var end_time;
+
+
 /* Related to styling */
 var _zoomX = canvasWidth / 2,
     _zoomY = canvasHeight / 2,
@@ -201,8 +206,9 @@ function labelsFill() {
 
 }
 
+ 
 
-/* getCenter = Appends center coords for each feature */
+/* Tra erseLabels = Appending centers to each feature(point, linestring, polygon, multi)  */ppends center coords for each feature */
 var getCenter = function(coords, geomtype) {
     var centerX = 0,
         centerY = 0;
@@ -279,8 +285,6 @@ var getCenter = function(coords, geomtype) {
     return [centerX, centerY];
 }
 
-
-/* TraverseLabels = Appending centers to each feature(point, linestring, polygon, multi)  */
 function traverseLabels(features) {
     for (var i = 0; i < features.length; i++) {
         var coords = features[i].geometry.coordinates;
@@ -298,7 +302,6 @@ function traverseLabels(features) {
         }
     }
 }
-
 
 /* New */
 function draw(features, action) {
@@ -418,8 +421,10 @@ function draw(features, action) {
 }
 
 
-/**
- *   @params : coordinates(array), action(string), geomtype(string)
+
+
+/*
+ rams : coordinates(array), action(string), geomtype(string)
  *       return : updating global variables 
  */
 function traverseCoordinates(coordinates, action, geomtype, properties) {
@@ -555,11 +560,8 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
     }
 
 }
-
-
-
 /*
- @param : features geojson 
+@param : features geojson 
     returns:  [MINX, ,MIN Y, MAXX, MAXY]
 */
 function getExtent(features) {
@@ -625,7 +627,6 @@ function getExtent(features) {
 
 
 /* Styling Params (Zoom, Pan, Pen, Color, Label) */
-
 function _equalPosition() {
     _zoomX = canvasWidth / 2, _zoomY = canvasHeight / 2, _moveX = 0, _moveY = 0, _labelWidth = 4, _penWidth = 1, scaleCount = 1;
     draw(geojson.features, 'draw');
