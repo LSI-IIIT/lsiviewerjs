@@ -147,7 +147,7 @@ app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 
 	}
 	console.log("file type = " + file_type);
-	if (file_type == "shapefile" || file_type == "gml") {
+	if ((file_type == "shapefile" && req.files.length >= 3) || file_type == "gml") {
 
 		var geojson = ogr2ogr(filepath)
 						.format('GeoJson')

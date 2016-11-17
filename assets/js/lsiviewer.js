@@ -10,7 +10,7 @@
 /* Global Variables Declaration */
 /* Related to Canvas */
 var canvas = document.getElementById("map"), context, canvasWidth=window.innerWidth, canvasHeight=window.innerHeight,
-    drawScale = null, xMin = 1000000000, xMax, yMin = 1000000000, yMax, shift_graph_to_center = 0;
+    drawScale = null, xMin = 1000000000, xMax = -1000000000000, yMin = 1000000000, yMax = -100000000000, shift_graph_to_center = 0;
 
 // benchmarking variables 
 var start_time;
@@ -330,6 +330,7 @@ function draw(features, action) {
             }
         } else if (geomtype == "Point" || geomtype == "MultiPoint") {
             // console.log("coords of "+ geomtype + " is = " + coords);
+            traverseCoordinates(coords, action, geomtype);
             if (labelFlag == 1) {
                 // console.log("Label toggle");
                 cx = props["centerX"];
@@ -344,7 +345,7 @@ function draw(features, action) {
                 context.fillText(props[labelValue], cx, cy);
                 context.restore();
             }
-            traverseCoordinates(coords, action, geomtype);
+            
         } else if (geomtype == "LineString") {
             traverseCoordinates(coords, action, geomtype);
             if (labelFlag == 1) {
@@ -382,20 +383,29 @@ function traverseCoordinates(coordinates, action, geomtype) {
     if (geomtype == "Point" || geomtype == "MultiPoint") {
         var x = coordinates[0];
         var y = coordinates[1];
+        console.log( "x = " + x + " y = " + y);
         if (action == 'bbox') {
 //            console.log("in bbox, x = " + x + " xMin = " + xMin);
             xMin = xMin < x ? xMin : x;
             xMax = xMax > x ? xMax : x;
             yMin = yMin < y ? yMin : y;
             yMax = yMax > y ? yMax : y;
+
+            xMin = xMin - 10;
+            yMax = yMax + 10;
+            xMax = xMax + 10;
+            yMin = yMin - 10;
+            console.log("xMin = " + xMin + " xMax = " + xMax + " yMin = " + yMin + " yMax = " + yMax);
         } else if (action == 'draw') {
+            console.log("Draw function to Point ");
             x = (x - xMin) * drawScale;
             y = (yMax - y) * drawScale;
             //  context.lineTo(x,y);
             context.beginPath();
-            context.rect(x, y, 2, 2);
+            context.arc(x, y, 10, 0, 2*Math.PI);
             context.fillStyle = _fillColor;
-            context.StrokeStyle = _strokeColor;
+            context.strokeStyle = _strokeColor;
+            context.lineWidth = 5;
             context.fill();
             context.stroke();
         }
@@ -678,7 +688,7 @@ var MouseDown = function(evt) {
     document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
     lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
     lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-    console.log("lastX = " + lastX + "lastY = " + lastY);
+   // console.log("lastX = " + lastX + "lastY = " + lastY);
     dragStart = [lastX, lastY];
     dragged = false;
 }
@@ -688,10 +698,10 @@ var MouseMove = function(evt) {
     lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
     lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
     dragged = true;
-    if (dragStart !== null) {
+    if (dragStart != undefined) {
         var pt = [lastX, lastY];
-        console.log(" mm pt[0] = " + pt[0]);
-        console.log("dragStart[0] = " + dragStart[0])
+    //    console.log(" mm pt[0] = " + pt[0]);
+  //      console.log("dragStart[0] = " + dragStart[0])
         _moveX = pt[0] - dragStart[0];
         _moveY = pt[1] - dragStart[1];
         draw(geojson.features, 'draw');
