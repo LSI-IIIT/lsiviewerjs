@@ -9,8 +9,13 @@
  */
 /* Global Variables Declaration */
 /* Related to Canvas */
-var canvas = document.getElementById("map"), context, canvasWidth=window.innerWidth, canvasHeight=window.innerHeight,
-    drawScale = null, xMin = 1000000000, xMax = -1000000000000, yMin = 1000000000, yMax = -100000000000, shift_graph_to_center = 0;
+var canvas = document.getElementById("map"), context, canvasWidth = window.innerWidth, canvasHeight = window.innerHeight,
+    drawScale = null,
+    xMin = Number.MIN_VAL,
+    xMax = Number.MAX_VAL,
+    yMin = Number.MIN_VAL,
+    yMax = Number.MAX_VAL, 
+    shift_graph_to_center = 0;
 
 // benchmarking variables 
 var start_time;
@@ -163,7 +168,8 @@ function initJson(geojson) {
     canvas = document.getElementById('map');
     context = canvas.getContext('2d');
     //Calculating Bounding Box 
-    draw(geojson.features, 'bbox');
+    var bbox = getExtent(geojson.features);
+    xMin = bbox[0], xMax = bbox[2], yMin = bbox[1], yMax = bbox[3];
     xScale = canvas.width / Math.abs(xMax - xMin);
     yScale = canvas.height / Math.abs(yMax - yMin);
     drawScale = xScale < yScale ? xScale : yScale;
@@ -200,42 +206,39 @@ function labelsFill() {
 var getCenter = function(coords, geomtype) {
     var centerX = 0,
         centerY = 0;
-    // console.log("geomtype = "+ geomtype+ "coords = "+ coords.length);
+     var pMinx = Number.MIN_VAL,
+        pMaxx = Number.MAX_VAL,
+        pMiny = Number.MIN_VAL,
+        pMaxy = Number.MAX_VAL;
+
     if (geomtype == "Point") {
         centerX = coords[0];
         centerY = coords[1];
     } else if (geomtype == "LineString") {
-     //   console.log("LineString Coords" + coords[0].length);
         for (var i = 0; i < coords.length; i++) {
             var obj = coords[i];
-            centerX += parseFloat(obj[0]);
-            centerY += parseFloat(obj[1]);
-        }
-        centerX /= coords[0].length;
-        centerY /= coords[0].length;
-    } else if (geomtype == "Polygon") {
-        var pMinx, pMaxx, pMiny, pMaxy;
-        for (var i = 0; i < coords[0].length; i++) {
-            var obj = coords[0][i];
             pMinx = pMinx < obj[0] ? pMinx : obj[0];
             pMaxx = pMaxx > obj[0] ? pMaxx : obj[0];
             pMiny = pMiny < obj[1] ? pMiny : obj[1];
             pMaxy = pMaxy > obj[1] ? pMaxy : obj[1];
+        }
+        centerX = (pMinx + pMaxx) / 2;
+        centerY = (pMiny + pMaxy) / 2;
+    } else if (geomtype == "Polygon") {
+        for (var i = 0; i < coords.length; i++) {
+            for (var j = 0; j < coords[i].length; j++) {
+                var obj = coords[i][j];
+                pMinx = pMinx < obj[0] ? pMinx : obj[0];
+                pMaxx = pMaxx > obj[0] ? pMaxx : obj[0];
+                pMiny = pMiny < obj[1] ? pMiny : obj[1];
+                pMaxy = pMaxy > obj[1] ? pMaxy : obj[1];
+            }
         }
         centerX = (pMinx + pMaxx) / 2;
         centerY = (pMiny + pMaxy) / 2;
     } else if (geomtype == "MultiPoint") {
-        for (var i = 0; i < coords[0].length; i++) {
-            var obj = coords[0][i];
-            centerX += parseFloat(obj[0]);
-            centerY += parseFloat(obj[1]);
-        }
-        centerX /= coords[0].length;
-        centerY /= coords[0].length;
-    } else if (geomtype == "MultiLineString") {
-        var pMinx, pMaxx, pMiny, pMaxy;
-        for (var i = 0; i < coords[0].length; i++) {
-            var obj = coords[0][i];
+        for (var i = 0; i < coords.length; i++) {
+            var obj = coords[i];
             pMinx = pMinx < obj[0] ? pMinx : obj[0];
             pMaxx = pMaxx > obj[0] ? pMaxx : obj[0];
             pMiny = pMiny < obj[1] ? pMiny : obj[1];
@@ -243,9 +246,39 @@ var getCenter = function(coords, geomtype) {
         }
         centerX = (pMinx + pMaxx) / 2;
         centerY = (pMiny + pMaxy) / 2;
-    } else if (geomtype == "MultiPolygon") {}
+    } else if (geomtype == "MultiLineString") {
+        var pMinx, pMaxx, pMiny, pMaxy;
+        for (var j = 0; j < coords.length; j++) {
+            for (var i = 0; i < coords[j].length; i++) {
+                var obj = coords[j][i];
+                pMinx = pMinx < obj[0] ? pMinx : obj[0];
+                pMaxx = pMaxx > obj[0] ? pMaxx : obj[0];
+                pMiny = pMiny < obj[1] ? pMiny : obj[1];
+                pMaxy = pMaxy > obj[1] ? pMaxy : obj[1];
+            }
+        }
+        centerX = (pMinx + pMaxx) / 2;
+        centerY = (pMiny + pMaxy) / 2;
+    } else if (geomtype == "MultiPolygon") {
+        for (var i1 = 0; i1 < coords.length; i1++) {
+            for (var i2 = 0; i2 < coords[i1].length; i2++) {
+                for (var i3 = 0; i3 < coords[i1].length; i3++) {
+                var obj = coords[i1][i2][i3];
+                for (var j = 0; j < obj.length; j++) {
+                        pMinx = pMinx < obj[0] ? pMinx : obj[0];
+                        pMaxx = pMaxx > obj[0] ? pMaxx : obj[0];
+                        pMiny = pMiny < obj[1] ? pMiny : obj[1];
+                        pMaxy = pMaxy > obj[1] ? pMaxy : obj[1];
+                    }
+                }
+            }
+        }
+        centerX = (pMinx + pMaxx) / 2;
+        centerY = (pMiny + pMaxy) / 2;
+    }
     return [centerX, centerY];
 }
+
 
 /* TraverseLabels = Appending centers to each feature(point, linestring, polygon, multi)  */
 function traverseLabels(features) {
@@ -267,24 +300,18 @@ function traverseLabels(features) {
 }
 
 
-/* Traverse Features = Draw (Heart in the application) */
-
+/* New */
 function draw(features, action) {
-
     context.beginPath();
     context.clearRect(0, 0, (canvasWidth), (canvasHeight));
-
     if (_backgroundColor != null) {
         context.fillStyle = _backgroundColor;
-        context.fillRect(0,0,canvasWidth, canvasHeight)
+        context.fillRect(0, 0, canvasWidth, canvasHeight)
     }
     context.save();
-
     context.translate(_zoomX, _zoomY);
     context.scale(scaleCount, scaleCount);
-
     context.translate(-_zoomX, -_zoomY);
-
     context.translate(_moveX, _moveY);
 
     if (shift_graph_to_center == 1) {
@@ -302,12 +329,13 @@ function draw(features, action) {
         context.drawImage(imageObj, canvasWidth - 400, canvasHeight - 100, w, h);
     };
 
-    imageObj.src = 'assets/img/north.png';
-    if (features.length == undefined) {
-        addImageOnCanvas('./assets/img/error_page.jpg');
+    imageObj.src = 'img/north.png';
+    if (features == null || features.length == undefined) {
+        addImageOnCanvas('img/error_page.jpg');
         return
-    }
-  //  console.log('Features length = ' + features.length)
+    } 
+
+    
     for (var i = 0; i < features.length; i++) {
         var coords = features[i].geometry.coordinates;
         var geomtype = features[i].geometry.type;
@@ -315,7 +343,7 @@ function draw(features, action) {
 
         // console.log("geomtype Bitch"+ geomtype+ "  with data = "+ coords);
         if (geomtype == "Polygon") {
-            traverseCoordinates(coords[0], action, geomtype);
+            traverseCoordinates(coords, action, geomtype, props);
             if (labelFlag == 1) {
                 cx = props["centerX"];
                 cy = props["centerY"];
@@ -330,7 +358,7 @@ function draw(features, action) {
             }
         } else if (geomtype == "Point" || geomtype == "MultiPoint") {
             // console.log("coords of "+ geomtype + " is = " + coords);
-            traverseCoordinates(coords, action, geomtype);
+            traverseCoordinates(coords, action, geomtype, props);
             if (labelFlag == 1) {
                 // console.log("Label toggle");
                 cx = props["centerX"];
@@ -347,7 +375,7 @@ function draw(features, action) {
             }
             
         } else if (geomtype == "LineString") {
-            traverseCoordinates(coords, action, geomtype);
+            traverseCoordinates(coords, action, geomtype, props);
             if (labelFlag == 1) {
                 cx = props["centerX"];
                 cy = props["centerY"];
@@ -360,65 +388,78 @@ function draw(features, action) {
                 context.restore();
             }
         } else if (geomtype == "MultiLineString") {
-            traverseCoordinates(coords[0], action, geomtype);
+            traverseCoordinates(coords, action, geomtype, props);
         } else if (geomtype == "MultiPolygon") {
-            for (var k = 0; k < coords.length; k++) {
-                traverseCoordinates(coords[k][0], action, geomtype);
+            traverseCoordinates(coords, action, geomtype, props);
+            //Labelling 
+            if (labelFlag == 1) {
+                cx = props["centerX"];
+                cy = props["centerY"];
+                
+                cx = (cx - xMin) * drawScale;
+                cy = (yMax - cy) * drawScale;
+                
+                context.save();
+                context.font = _labelWidth + "pt Calibri";
+                context.fillStyle = _labelColor;
+                context.fillText(props[labelValue], cx - 8, cy);
+                context.restore();
             }
         }
     }
-    
+
     context.restore();
     if (_exporting == true) {
-        context.font = "14pt Calibri";
+        context.font = "12pt Calibri";
         context.fillStyle = "#000000";
-        context.fillText("Generating using Lsiviewer(http://lsi.iiit.ac.in/lsiviewer)", canvasWidth/2 - 120, canvasHeight - 30);
+        context.fillText("Generating using Lsiviewer(http://lsi.iiit.ac.in/lsiviewer)", canvasWidth / 2 - 300, canvasHeight - 30);        
+        
     }
 }
 
+
 /**
- *   This method 
+ *   @params : coordinates(array), action(string), geomtype(string)
+ *       return : updating global variables 
  */
-function traverseCoordinates(coordinates, action, geomtype) {
-    if (geomtype == "Point" || geomtype == "MultiPoint") {
+function traverseCoordinates(coordinates, action, geomtype, properties) {
+
+    if (geomtype == "Point" ) {
         var x = coordinates[0];
         var y = coordinates[1];
-        console.log( "x = " + x + " y = " + y);
-        if (action == 'bbox') {
-//            console.log("in bbox, x = " + x + " xMin = " + xMin);
-            xMin = xMin < x ? xMin : x;
-            xMax = xMax > x ? xMax : x;
-            yMin = yMin < y ? yMin : y;
-            yMax = yMax > y ? yMax : y;
-
-            xMin = xMin - 10;
-            yMax = yMax + 10;
-            xMax = xMax + 10;
-            yMin = yMin - 10;
-            console.log("xMin = " + xMin + " xMax = " + xMax + " yMin = " + yMin + " yMax = " + yMax);
-        } else if (action == 'draw') {
-            console.log("Draw function to Point ");
+        if (action == 'draw') {
             x = (x - xMin) * drawScale;
             y = (yMax - y) * drawScale;
-            //  context.lineTo(x,y);
+            // context.lineTo(x,y);
             context.beginPath();
-            context.arc(x, y, 10, 0, 2*Math.PI);
+            context.arc(x, y, 3, 0, 2 * Math.PI);
             context.fillStyle = _fillColor;
-            context.strokeStyle = _strokeColor;
-            context.lineWidth = 5;
+            context.StrokeStyle = _strokeColor;
             context.fill();
             context.stroke();
+            context.closePath();
         }
-    } else {
+    } else if (geomtype == "MultiPoint") {
+        for (var j = 0; j < coordinates.length; j++) {
+                var x = coordinates[j][0];
+                var y = coordinates[j][1];
+                if (action == 'draw') {
+                    x = (x - xMin) * drawScale;
+                    y = (yMax - y) * drawScale;
+                    context.beginPath();
+                    context.arc(x, y, 3, 0, 2 * Math.PI);
+                    context.fillStyle = _fillColor;
+                    context.StrokeStyle = _strokeColor;
+                    context.fill();
+                    context.stroke();
+                    context.closePath();
+                }
+        }
+    } else if(geomtype == "LineString"){
         for (var j = 0; j < coordinates.length; j++) {
             var x = coordinates[j][0];
             var y = coordinates[j][1];
-            if (action == 'bbox') {
-                xMin = xMin < x ? xMin : x;
-                xMax = xMax > x ? xMax : x;
-                yMin = yMin < y ? yMin : y;
-                yMax = yMax > y ? yMax : y;
-            } else if (action == 'draw') {
+            if (action == 'draw') {
                 x = (x - xMin) * drawScale;
                 y = (yMax - y) * drawScale;
                 if (j == 0) {
@@ -429,16 +470,159 @@ function traverseCoordinates(coordinates, action, geomtype) {
                 }
             }
         }
-        if (action == 'draw') {
-            context.strokeStyle = _strokeColor;
-            context.stroke();
-            if (geomtype != "LineString") {
-                context.fillStyle = _fillColor;
-                context.fill();
+    } else if (geomtype == "MultiLineString") {
+        for (var j1 = 0; j1 < coordinates.length; j1++) {
+            for (var j2 = 0; j2 < coordinates[j1].length; j2++) {
+                var x = coordinates[j1][j2][0];
+                var y = coordinates[j1][j2][1];
+                if (action == 'draw') {
+                    x = (x - xMin) * drawScale;
+                    y = (yMax - y) * drawScale;
+                    if (j2 == 0) {
+                        context.moveTo(x, y);
+                    } else {
+                        context.lineTo(x, y);
+                    }
+                }
+            }
+        }
+    } else if (geomtype == "Polygon") {
+        for (var j1 = 0; j1 < coordinates.length; j1++) {
+            for (var j2 = 0; j2 < coordinates[j1].length; j2++) {
+                var x = coordinates[j1][j2][0];
+                var y = coordinates[j1][j2][1];
+                if (action == 'draw') {
+                    x = (x - xMin) * drawScale;
+                    y = (yMax - y) * drawScale;
+                    if (j1 == 0 && j2 == 0) {
+                        context.beginPath();
+                    }
+                    if (j2 == 0) {
+                        context.moveTo(x, y);
+                    } else {
+                        context.lineTo(x, y);
+                    }
+                }
+            }
+        }
+        context.closePath();
+    } else if (geomtype == "MultiPolygon") {
+        for (var j1 = 0; j1 < coordinates.length; j1++) {
+            for (var j2 = 0; j2 < coordinates[j1].length; j2++) {
+                for (var j3 = 0; j3 < coordinates[j1][j2].length; j3++) {
+                    var x = coordinates[j1][j2][j3][0];
+                    var y = coordinates[j1][j2][j3][1];
+                    if (action == 'draw') {
+                        x = (x - xMin) * drawScale;
+                        y = (yMax - y) * drawScale;
+                        if (j1 == 0 && j2 == 0 && j3 == 0) {
+                            context.beginPath();
+                        }
+                        if (j3 == 0) {
+                            context.moveTo(x, y);
+                        } else {
+                            context.lineTo(x, y);
+                        }
+                    }
+                }
+
+            }
+        }
+    } else {
+        for (var j = 0; j < coordinates.length; j++) {
+            var x = coordinates[j][0];
+            var y = coordinates[j][1];
+            if (action == 'draw') {
+                x = (x - xMin) * drawScale;
+                y = (yMax - y) * drawScale;
+                if (j == 0) {
+                    context.beginPath();
+                    context.moveTo(x, y);
+                } else {
+                    context.lineTo(x, y);
+                }
             }
         }
     }
+    if (action == 'draw') {
+        if (geomtype == "Polygon" || geomtype == "MultiPolygon") {
+            context.fillStyle = _fillColor;
+            context.fill();
+        }
+        context.strokeStyle = _strokeColor;
+        context.stroke();
+
+    }
+
 }
+
+
+
+/*
+ @param : features geojson 
+    returns:  [MINX, ,MIN Y, MAXX, MAXY]
+*/
+function getExtent(features) {
+    var xMin = Number.MIN_VAL,
+        xMax = Number.MAX_VAL,
+        yMin = Number.MIN_VAL,
+        yMax = Number.MAX_VAL;
+    for (var i = 0; i < features.length; i++) {
+        var coordinates = features[i].geometry.coordinates;
+        var geomtype = features[i].geometry.type;
+
+        if (geomtype == "Point" || geomtype == "MultiPoint") {
+            var x = coordinates[0];
+            var y = coordinates[1];
+            // console.log("in bbox, x = " + x + " xMin = " + xMin);
+            xMin = xMin < x
+             ? xMin : x;
+            xMax = xMax > x ? xMax : x;
+            yMin = yMin < y ? yMin : y;
+            yMax = yMax > y ? yMax : y;
+        } else if (geomtype == "Polygon") {
+            for (var j1 = 0; j1 < coordinates.length; j1++) {
+                for (var j2 = 0; j2 < coordinates[j1].length; j2++) {
+                    var x = coordinates[j1][j2][0];
+                    var y = coordinates[j1][j2][1];
+
+                    xMin = xMin < x ? xMin : x;
+                    xMax = xMax > x ? xMax : x;
+                    yMin = yMin < y ? yMin : y;
+                    yMax = yMax > y ? yMax : y;
+                }
+            }
+
+        } else if (geomtype == "MultiPolygon") {
+            for (var j1 = 0; j1 < coordinates.length; j1++) {
+                for (var j2 = 0; j2 < coordinates[j1].length; j2++) {
+                    for (var j3 = 0; j3 < coordinates[j1][j2].length; j3++) {
+                        var x = coordinates[j1][j2][j3][0];
+                        var y = coordinates[j1][j2][j3][1];
+                        xMin = xMin < x ? xMin : x;
+                        xMax = xMax > x ? xMax : x;
+                        yMin = yMin < y ? yMin : y;
+                        yMax = yMax > y ? yMax : y;
+                    }
+
+                }
+            }
+        } else {
+            for (var j = 0; j < coordinates.length; j++) {
+                var x = coordinates[j][0];
+                var y = coordinates[j][1];
+                xMin = xMin < x ? xMin : x;
+                xMax = xMax > x ? xMax : x;
+                yMin = yMin < y ? yMin : y;
+                yMax = yMax > y ? yMax : y;
+            }
+        }
+
+    }
+    console.log("Extent coordinates = " + xMin + " " + xMax + " " + yMin + " " + yMax);
+    return [xMin, yMin, xMax, yMax];
+}
+
 
 /* Styling Params (Zoom, Pan, Pen, Color, Label) */
 
@@ -688,7 +872,7 @@ var MouseDown = function(evt) {
     document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
     lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
     lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
-   // console.log("lastX = " + lastX + "lastY = " + lastY);
+    console.log("lastX = " + lastX + "lastY = " + lastY);
     dragStart = [lastX, lastY];
     dragged = false;
 }
@@ -698,10 +882,10 @@ var MouseMove = function(evt) {
     lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
     lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
     dragged = true;
-    if (dragStart != undefined) {
+    if (dragStart !== null) {
         var pt = [lastX, lastY];
-    //    console.log(" mm pt[0] = " + pt[0]);
-  //      console.log("dragStart[0] = " + dragStart[0])
+        console.log(" mm pt[0] = " + pt[0]);
+        console.log("dragStart[0] = " + dragStart[0])
         _moveX = pt[0] - dragStart[0];
         _moveY = pt[1] - dragStart[1];
         draw(geojson.features, 'draw');
@@ -788,3 +972,4 @@ $(document).ready(function() {
         }
     });
 });
+
