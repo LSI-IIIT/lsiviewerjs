@@ -177,6 +177,13 @@ function initJson(geojson) {
         shift_graph_to_center = 1;
        // console.log("shift_graph_to_center = " + shift_graph_to_center);
     }
+
+    // Perfomance calculation 
+    var features_count = get_features_count(geojson);
+    var vertices_count = get_vertices_count(geojson);
+    console.log("features count = " + features_count);
+    console.log("vertices count = " + vertices_count);
+
     // check for shifting the figure 
    // console.log(" for Points xMin = " + xMin + " xMax = " + xMax + " yMin = " + yMin + " yMax = " + yMax + " xScale = " + xScale + " yScale = " + yScale + " drawScale = " + drawScale);
 }
@@ -571,16 +578,48 @@ function getExtent(features) {
         var coordinates = features[i].geometry.coordinates;
         var geomtype = features[i].geometry.type;
 
-        if (geomtype == "Point" || geomtype == "MultiPoint") {
+        if (geomtype == "Point") {
             var x = coordinates[0];
             var y = coordinates[1];
             // console.log("in bbox, x = " + x + " xMin = " + xMin);
-            xMin = xMin < x
-             ? xMin : x;
+            xMin = xMin < x ? xMin : x;
             xMax = xMax > x ? xMax : x;
             yMin = yMin < y ? yMin : y;
             yMax = yMax > y ? yMax : y;
-        } else if (geomtype == "Polygon") {
+        } 
+        else if(geomtype == "MultiPoint") {
+            for (var j = 0; j < coordinates.length; j++) {
+                var x = coordinates[j][0];
+                var y = coordinates[j][1];
+                xMin = xMin < x ? xMin : x;
+                xMax = xMax > x ? xMax : x;
+                yMin = yMin < y ? yMin : y;
+                yMax = yMax > y ? yMax : y;
+            }
+        } 
+        else if(geomtype == "LineString") {
+            for (var j = 0; j < coordinates.length; j++) {
+                var x = coordinates[j][0];
+                var y = coordinates[j][1];          
+                xMin = xMin < x ? xMin : x;
+                xMax = xMax > x ? xMax : x;
+                yMin = yMin < y ? yMin : y;
+                yMax = yMax > y ? yMax : y;
+            }
+        }
+        else if(geomtype == "MultiLineString") {
+            for (var j1 = 0; j1 < coordinates.length; j1++) {
+                for (var j2 = 0; j2 < coordinates[j1].length; j2++) {
+                    var x = coordinates[j1][j2][0];
+                    var y = coordinates[j1][j2][1];
+                    xMin = xMin < x ? xMin : x;
+                    xMax = xMax > x ? xMax : x;
+                    yMin = yMin < y ? yMin : y;
+                    yMax = yMax > y ? yMax : y;   
+                }
+            }
+        }
+        else if (geomtype == "Polygon") {
             for (var j1 = 0; j1 < coordinates.length; j1++) {
                 for (var j2 = 0; j2 < coordinates[j1].length; j2++) {
                     var x = coordinates[j1][j2][0];
@@ -884,8 +923,6 @@ var MouseMove = function(evt) {
     dragged = true;
     if (dragStart !== null) {
         var pt = [lastX, lastY];
-        console.log(" mm pt[0] = " + pt[0]);
-        console.log("dragStart[0] = " + dragStart[0])
         _moveX = pt[0] - dragStart[0];
         _moveY = pt[1] - dragStart[1];
         draw(geojson.features, 'draw');
@@ -972,4 +1009,55 @@ $(document).ready(function() {
         }
     });
 });
+
+
+// Extract metrics :
+function get_features_count(geojson){
+    return geojson.features != undefined? geojson.features.length : 0;
+}
+
+function get_vertices_count(geojson){
+    
+    if (geojson.features == undefined){
+        return 0;
+    }
+    var feature = geojson.features;
+    var vertices_count = 0;
+    for (var i=0; i<feature.length; i++){
+        
+        if(feature[i].geometry.type == "Point"){
+            vertices_count = vertices_count + 1;
+        }  
+        
+        else if(feature[i].geometry.type == "MultiPoint"){
+            vertices_count = vertices_count + feature[i].geometry.coordinates.length; 
+        }
+
+        else if(feature[i].geometry.type == "LineString"){
+            vertices_count = vertices_count + feature[i].geometry.coordinates.length;    
+        }
+
+        else if(feature[i].geometry.type == "MultiLineString"){
+            for(var j=0; j<feature[i].geometry.coordinates.length; j++){
+                vertices_count = vertices_count + feature[i].geometry.coordinates[j].length; 
+            }
+        }
+
+        else if(feature[i].geometry.type == "Polygon"){
+            for(var j=0; j<feature[i].geometry.coordinates.length; j++){
+                vertices_count = vertices_count + feature[i].geometry.coordinates[j].length;
+            }
+
+        }
+
+        else if(feature[i].geometry.type == "MultiPolygon"){
+            for(var j=0; j<feature[i].geometry.coordinates.length; j++){
+                for(var k=0; k<feature[i].geometry.coordinates[j].length; k++){
+                    vertices_count = vertices_count + feature[i].geometry.coordinates[j][k].length;           
+                }
+            }
+        }
+    }
+    return vertices_count;
+}
 
