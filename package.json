@@ -13,7 +13,8 @@
     "multer": "^1.1.0",
     "nodemon": "^1.9.0",
     "ogr2ogr": "^0.5.1",
-    "togeojson": "^0.13.0"
+    "togeojson": "^0.13.0",
+    "fs.realpath": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {
