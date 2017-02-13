@@ -16,8 +16,8 @@
 
 Make sure node js(v5 or newer) libraries are installed or 
 * For node js installation - 
-** curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
-** sudo apt-get install nodejs 
+	+ curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+	+ sudo apt-get install nodejs 
 * For node-gyp installation - sudo npm install -g node-gyp
 * To check node js version : node --verison 
 
