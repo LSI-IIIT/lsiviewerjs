@@ -20,7 +20,8 @@ var canvas = document.getElementById("map"), context, canvasWidth = window.inner
 // benchmarking variables 
 var start_time;
 var end_time;
-
+var lines_count = 0;
+var arcs_count = 0;
 
 /* Related to styling */
 var _zoomX = canvasWidth / 2,
@@ -59,6 +60,14 @@ window.onload = function() {
     addImageOnCanvas('./assets/img/upload_files.jpg');
 
 };
+
+function count_lines(){
+   lines_count++; 
+}
+
+function count_arcs(){
+   arcs_count++; 
+}
 
 function submitForm() {
     start_time = performance.now();
@@ -156,7 +165,8 @@ function loadData(response) {
     console.log("To draw the file it took " + (t1 - t0) + " milliseconds.");
     console.log("To communicate with server, convert and draw the file it took " + (t1-start_time) + " milliseconds.");
     console.log("Extent = " + ((yMax - yMin) * (xMax - xMin) * drawScale * drawScale ) / 1000);
-
+    console.log("Lines " = lines_count);
+    console.log("Arcs " = arcs_count);
 
     labelsFill();
     traverseLabels(geojson.features);
@@ -211,7 +221,6 @@ function labelsFill() {
     }
 
 }
-
 
 /* getCenter = Appends center coords for each feature */
 var getCenter = function(coords, geomtype) {
@@ -449,6 +458,8 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
             context.fill();
             context.stroke();
             context.closePath();
+            // benchmark 
+            count_arcs();
         }
     } else if (geomtype == "MultiPoint") {
         for (var j = 0; j < coordinates.length; j++) {
@@ -464,6 +475,8 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                     context.fill();
                     context.stroke();
                     context.closePath();
+                    //benchmark 
+                    count_arcs();
                 }
         }
     } else if(geomtype == "LineString"){
@@ -478,6 +491,8 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                     context.moveTo(x, y);
                 } else {
                     context.lineTo(x, y);
+                    // benchmark 
+                    count_lines();
                 }
             }
         }
@@ -493,6 +508,8 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                         context.moveTo(x, y);
                     } else {
                         context.lineTo(x, y);
+                        // benchmark 
+                        count_lines();
                     }
                 }
             }
@@ -512,6 +529,8 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                         context.moveTo(x, y);
                     } else {
                         context.lineTo(x, y);
+                        // benchmark 
+                        count_lines();
                     }
                 }
             }
@@ -533,6 +552,8 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                             context.moveTo(x, y);
                         } else {
                             context.lineTo(x, y);
+                            // benchmark 
+                            count_lines();
                         }
                     }
                 }
@@ -551,6 +572,8 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                     context.moveTo(x, y);
                 } else {
                     context.lineTo(x, y);
+                    // benchmark 
+                    count_lines();
                 }
             }
         }
