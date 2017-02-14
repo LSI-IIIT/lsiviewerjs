@@ -147,13 +147,17 @@ function loadData(response) {
     canvas.addEventListener('DOMMouseScroll', handleScroll, false);
     // Chrome, Safari, IE6: 
     canvas.addEventListener('mousewheel', handleScroll, false);
+    
+    init_json(geojson);
+    
     var t0 = performance.now();
-    initJson(geojson);
-
     draw(geojson.features, 'draw');
     var t1 = performance.now();
-    console.log("To draw the file it took " + (t1 - t0) + " milliseconds.")
-    console.log("To communicate with server, convert and draw the file it took " + (t1-start_time) + " milliseconds.")
+    console.log("To draw the file it took " + (t1 - t0) + " milliseconds.");
+    console.log("To communicate with server, convert and draw the file it took " + (t1-start_time) + " milliseconds.");
+    console.log("Extent = " + ((yMax - yMin) * (xMax - xMin) * drawScale * drawScale ) / 1000);
+
+
     labelsFill();
     traverseLabels(geojson.features);
 };
@@ -163,7 +167,7 @@ function loadData(response) {
   * This method will declare the canvas and context along with their width and height. 
   * @param: shift_graph_to_center is used to if graph needs to be drawn from center.    
  **/
-function initJson(geojson) {
+function init_json(geojson) {
     //Initial setup for canvas
     canvas = document.getElementById('map');
     context = canvas.getContext('2d');
