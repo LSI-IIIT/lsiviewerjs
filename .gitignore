@@ -25,11 +25,10 @@ build/Release
 
 # Dependency directories
 node_modules/
-<<<<<<< HEAD
-=======
 temp/
 uploads/
->>>>>>> Checking number of lines and arcs that were drawn with each data file
+temp/
+uploads/
 jspm_packages
 
 # Optional npm cache directory
