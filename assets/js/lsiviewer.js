@@ -22,6 +22,7 @@ var start_time;
 var end_time;
 var lines_count = 0;
 var arcs_count = 0;
+var moves_count = 0;
 
 /* Related to styling */
 var _zoomX = canvasWidth / 2,
@@ -67,6 +68,10 @@ function count_lines(){
 
 function count_arcs(){
    arcs_count++; 
+}
+
+function count_moves(){
+    moves_count++;
 }
 
 function submitForm() {
@@ -165,8 +170,11 @@ function loadData(response) {
     console.log("To draw the file it took " + (t1 - t0) + " milliseconds.");
     console.log("To communicate with server, convert and draw the file it took " + (t1-start_time) + " milliseconds.");
     console.log("Extent = " + ((yMax - yMin) * (xMax - xMin) * drawScale * drawScale ) / 1000);
-    console.log("Lines " = lines_count);
-    console.log("Arcs " = arcs_count);
+    console.log("Lines " + lines_count);
+    console.log("Moves" + moves_count);
+    lines_count = 0;
+    arcs_count = 0;
+    moves_count = 0;
 
     labelsFill();
     traverseLabels(geojson.features);
@@ -489,6 +497,7 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                 if (j == 0) {
                     context.beginPath();
                     context.moveTo(x, y);
+                    count_moves();
                 } else {
                     context.lineTo(x, y);
                     // benchmark 
@@ -506,6 +515,7 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                     y = (yMax - y) * drawScale;
                     if (j2 == 0) {
                         context.moveTo(x, y);
+                        count_moves();
                     } else {
                         context.lineTo(x, y);
                         // benchmark 
@@ -527,6 +537,7 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                     }
                     if (j2 == 0) {
                         context.moveTo(x, y);
+                        count_moves();
                     } else {
                         context.lineTo(x, y);
                         // benchmark 
@@ -550,6 +561,7 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                         }
                         if (j3 == 0) {
                             context.moveTo(x, y);
+                            count_moves();
                         } else {
                             context.lineTo(x, y);
                             // benchmark 
@@ -570,6 +582,7 @@ function traverseCoordinates(coordinates, action, geomtype, properties) {
                 if (j == 0) {
                     context.beginPath();
                     context.moveTo(x, y);
+                    count_moves();
                 } else {
                     context.lineTo(x, y);
                     // benchmark 
