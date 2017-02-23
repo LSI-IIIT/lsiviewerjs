@@ -4,11 +4,14 @@ var fs = require('fs');
 var jsonfile = require('jsonfile');
 var app = express();
 var path = require('path');
+var compression = require('compression');
 var multer = require('multer');
+var zlib = require('zlib');
 var tj = require('togeojson'),
     fs = require('fs'),
     // node doesn't have xml parsing or a dom. use jsdom
     jsdom = require('jsdom').jsdom;
+var lzma = require('lzma-native').createStream.bind(null, 'aloneEncoder');
 var path = './uploads/';
 var detectvectorformat = require('./detectvectorformat');
 /*
@@ -24,6 +27,9 @@ var storage =   multer.diskStorage({
     callback(null, file.originalname);
   }
 });
+
+
+
 
 app.use(express.static('assets'));
 app.use(express.static('uploads'));
@@ -148,7 +154,7 @@ app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 	}
 	console.log("file type = " + file_type);
 	if ((file_type == "shapefile" && req.files.length >= 3) || file_type == "gml") {
-
+		   	
 		var geojson = ogr2ogr(filepath)
 						.format('GeoJson')
 						.skipfailures()
@@ -156,19 +162,21 @@ app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 						.stream();
 		var writeStream = fs.createWriteStream(path + validated_object.file_name + '.json');
 		geojson.pipe(writeStream);
-		
+		var _res = res;
 		writeStream.on('finish', function() {
 	        // do stuff
-	        res.writeHead(200, {"Content-Type": "application/json"});
 		    var obj = fs.createReadStream(path + validated_object.file_name + '.json');
-			obj.pipe(res);
+			_res.writeHead(200, {"Content-Type": "application/json", "content-encoding": "deflate" });	
+			obj.pipe(zlib.createDeflate()).pipe(_res);
 	    });
 	}
+
 	if (file_type == "geojson" || file_type == "json") {
 		res.writeHead(200, {"Content-Type": "application/json"});
 		var obj = fs.createReadStream(filepath);
 		obj.pipe(res);	
 	}
+
 });
 
 
