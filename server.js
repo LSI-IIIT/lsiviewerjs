@@ -11,6 +11,7 @@ var tj = require('togeojson'),
     fs = require('fs'),
     // node doesn't have xml parsing or a dom. use jsdom
     jsdom = require('jsdom').jsdom;
+var brotli = require('iltorb').compressStream;
 var lzma = require('lzma-native').createStream.bind(null, 'aloneEncoder');
 var path = './uploads/';
 var detectvectorformat = require('./detectvectorformat');
@@ -166,8 +167,8 @@ app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 		writeStream.on('finish', function() {
 	        // do stuff
 		    var obj = fs.createReadStream(path + validated_object.file_name + '.json');
-			_res.writeHead(200, {"Content-Type": "application/json", "content-encoding": "deflate" });	
-			obj.pipe(zlib.createDeflate()).pipe(_res);
+			_res.writeHead(200, {"Content-Type": "application/json", "content-encoding": "br" });	
+			obj.pipe(brotli()).pipe(_res);
 	    });
 	}
 
