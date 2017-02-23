@@ -4,17 +4,22 @@
   "description": "Testing node with express, ogr2ogr",
   "main": "main.js",
   "dependencies": {
+    "accepts": "^1.3.3",
     "body-parser": "^1.15.0",
+    "compression": "^1.6.2",
     "cookie-parser": "^1.4.1",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
+    "fs.realpath": "^1.0.0",
+    "iltorb": "^1.0.13",
     "jsdom": "^8.1.0",
     "jsonfile": "^2.2.3",
+    "lzma-native": "^1.5.2",
     "multer": "^1.1.0",
     "nodemon": "^1.9.0",
     "ogr2ogr": "^0.5.1",
     "togeojson": "^0.13.0",
-    "fs.realpath": "^1.0.0"
+    "zlib": "^1.0.5"
   },
   "devDependencies": {},
   "scripts": {
