@@ -167,8 +167,8 @@ app.post('/uploadFiles', upload.array('files', 4), function(req, res, next) {
 		writeStream.on('finish', function() {
 	        // do stuff
 		    var obj = fs.createReadStream(path + validated_object.file_name + '.json');
-			_res.writeHead(200, {"Content-Type": "application/json", "content-encoding": "br" });	
-			obj.pipe(brotli()).pipe(_res);
+			_res.writeHead(200, {"Content-Type": "application/json", "content-encoding": "lzma" });	
+			obj.pipe(lzma()).pipe(_res);
 	    });
 	}
 

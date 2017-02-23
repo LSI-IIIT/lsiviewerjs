@@ -151,7 +151,11 @@ function addImageOnCanvas(url) {
 }
 
 function loadData(response) {
-    geojson = response;
+    my_lzma = new LZMA();
+    my_lzma.decompress(response, function(result) {
+        geojson = response;
+    })
+    
     //console.log(geojson);
     
     canvas.addEventListener('mousedown', MouseDown, false);
